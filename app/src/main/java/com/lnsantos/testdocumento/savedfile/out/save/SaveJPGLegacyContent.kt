@@ -3,9 +3,11 @@ package com.lnsantos.testdocumento.savedfile.out.save
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Bitmap.CompressFormat.JPEG
+import android.net.Uri
 import android.os.Build
 import android.os.Environment.DIRECTORY_DOWNLOADS
 import android.os.Environment.getExternalStoragePublicDirectory
+import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import androidx.core.net.toUri
@@ -37,6 +39,18 @@ class SaveJPGLegacyContent(
         try {
             val file = createFile()
             val bitmap = create(view)
+
+            if (Build.VERSION.SDK_INT < 23) {
+                val path = MediaStore.Images.Media.insertImage(
+                    context.contentResolver,
+                    bitmap,
+                    filename,
+                    String()
+                )
+                val uri = File(path)
+                callback.onSuccessSavedFile(uri.toUri())
+                return@withContext
+            }
 
             if(!file.createNewFile()) {
                 callback.onFailedSavedFile()
