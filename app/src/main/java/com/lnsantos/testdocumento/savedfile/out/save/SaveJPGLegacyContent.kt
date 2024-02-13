@@ -3,14 +3,11 @@ package com.lnsantos.testdocumento.savedfile.out.save
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Bitmap.CompressFormat.JPEG
-import android.media.ExifInterface
 import android.os.Build
 import android.os.Environment.DIRECTORY_DOWNLOADS
 import android.os.Environment.getExternalStoragePublicDirectory
-import android.provider.MediaStore
 import android.util.Log
 import android.view.View
-import androidx.annotation.RequiresApi
 import androidx.core.net.toUri
 import com.lnsantos.testdocumento.savedfile.`in`.ICreateContent
 import com.lnsantos.testdocumento.savedfile.`in`.SavedFiledContent
@@ -19,7 +16,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
-import java.nio.file.Files
 import java.util.Date
 
 class SaveJPGLegacyContent(
