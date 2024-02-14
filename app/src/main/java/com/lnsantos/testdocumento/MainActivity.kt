@@ -2,11 +2,11 @@ package com.lnsantos.testdocumento
 
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.pm.PackageManager.PERMISSION_DENIED
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -55,12 +55,16 @@ class MainActivity : AppCompatActivity(), SavedFiledContent.Callback {
 
         button.setOnClickListener {
 
-            val notHasPermission = ContextCompat.checkSelfPermission(this, WRITE_EXTERNAL_STORAGE) == PERMISSION_DENIED
+            val notHasPermission =
+                ContextCompat.checkSelfPermission(this, WRITE_EXTERNAL_STORAGE) == PERMISSION_DENIED
 
             if (notHasPermission) {
                 val notSupportedScope = Build.VERSION.SDK_INT < Build.VERSION_CODES.R
                 val hasSupportToCustomDialog = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-                val showCustomDialog =  hasSupportToCustomDialog && shouldShowRequestPermissionRationale(WRITE_EXTERNAL_STORAGE)
+                val showCustomDialog =
+                    hasSupportToCustomDialog && shouldShowRequestPermissionRationale(
+                        WRITE_EXTERNAL_STORAGE
+                    )
 
                 if (showCustomDialog || notSupportedScope) {
                     requestPermissionLauncher.launch(WRITE_EXTERNAL_STORAGE)
@@ -79,26 +83,39 @@ class MainActivity : AppCompatActivity(), SavedFiledContent.Callback {
         }
     }
 
+    private fun openImageByUri(target: Uri) {
+        try {
+
+            grantUriPermission(
+                packageName,
+                target,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION
+            )
+
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                putExtra(Intent.EXTRA_STREAM, target)
+                type = "image/*"
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
+            }
+
+            startActivity(intent)
+        } catch (e: Throwable) {
+            Toast.makeText(
+                this,
+                "Ocorreu um erro, inesperado",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
     override suspend fun onSuccessSavedFile(uri: Uri): Unit = withContext(Dispatchers.Main) {
 
-        grantUriPermission(
-            packageName,
-            uri,
-            Intent.FLAG_GRANT_READ_URI_PERMISSION
-        )
 
         AlertDialog.Builder(this@MainActivity).apply {
             setTitle("Salvo com sucesso")
             setMessage("Deseja acessar o arquivo, armazenado ?")
             setPositiveButton("Sim") { dialog, _ ->
-
-                val intent = Intent(Intent.ACTION_VIEW).apply {
-                    putExtra(Intent.EXTRA_STREAM, uri)
-                    type = "image/*"
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                }
-
-                startActivity(intent)
+                openImageByUri(uri)
                 dialog.dismiss()
             }
             setNegativeButton("Não", null)

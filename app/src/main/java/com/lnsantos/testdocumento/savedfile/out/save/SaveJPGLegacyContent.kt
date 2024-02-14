@@ -22,7 +22,7 @@ import java.util.Date
 
 class SaveJPGLegacyContent(
     createBitmap: ICreateContent<View, Bitmap>
-) : SavedFiledContent, ICreateContent<View, Bitmap> by createBitmap{
+) : SavedFiledContent, ICreateContent<View, Bitmap> by createBitmap {
 
     override val versionSupported: Int = Build.VERSION_CODES.LOLLIPOP
     override var filename: String = "legacy_${Date().time}.jpg"
@@ -35,7 +35,7 @@ class SaveJPGLegacyContent(
         view: View,
         context: Context,
         callback: SavedFiledContent.Callback
-    )= withContext(Dispatchers.IO) {
+    ) = withContext(Dispatchers.IO) {
         try {
             val file = createFile()
             val bitmap = create(view)
@@ -52,14 +52,14 @@ class SaveJPGLegacyContent(
                 return@withContext
             }
 
-            if(!file.createNewFile()) {
+            if (!file.createNewFile()) {
                 callback.onFailedSavedFile()
                 return@withContext
             }
 
             val fileOutput = FileOutputStream(file)
 
-            if(!bitmap.compress(JPEG, MAX_QUALITY, fileOutput)) {
+            if (!bitmap.compress(JPEG, MAX_QUALITY, fileOutput)) {
                 callback.onFailedSavedFile()
                 return@withContext
             }
